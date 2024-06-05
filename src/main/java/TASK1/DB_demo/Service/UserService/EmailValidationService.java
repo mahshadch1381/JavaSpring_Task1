@@ -1,4 +1,4 @@
-package TASK1.DB_demo.Service;
+package TASK1.DB_demo.Service.UserService;
 
 
 import org.springframework.stereotype.Service;

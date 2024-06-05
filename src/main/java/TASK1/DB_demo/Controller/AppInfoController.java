@@ -1,9 +1,8 @@
 package TASK1.DB_demo.Controller;
 
 import TASK1.DB_demo.Model.AppInfo;
-import TASK1.DB_demo.Model.User;
 import TASK1.DB_demo.Repository.AppInfoRepository;
-import TASK1.DB_demo.Service.AppInfoService;
+import TASK1.DB_demo.Service.AppInfoService.AppInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,11 +20,13 @@ public class AppInfoController {
 
     @GetMapping("/fetchAppInfo")
     public String fetchAppInfo() {
-        appInfoService.fetchAndSaveAppInfo();
-        return "App info fetched and saved successfully.";
+        return appInfoService.fetchAndSaveAppInfo();
+
     }
+
     @GetMapping(path="/allAppInfo")
-    public @ResponseBody Iterable<AppInfo> getAllUsers() {
+    public @ResponseBody Iterable<AppInfo> getAllUsers()
+    {
         return appInfoRepository.findAll();
     }
 }

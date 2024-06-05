@@ -2,13 +2,12 @@ package TASK1.DB_demo.Controller;
 
 import TASK1.DB_demo.Model.User;
 import TASK1.DB_demo.Repository.UserRepository;
-import TASK1.DB_demo.Service.EmailValidationService;
+import TASK1.DB_demo.Service.UserService.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 
 @Controller
@@ -16,69 +15,40 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private EmailValidationService emailValidationService;
+    @Autowired
+    private AddUserService addUserService;
+    @Autowired
+    private UpdateUserService updateUserService;
+    @Autowired
+    private GetUserByNameService getByNameService;
+    @Autowired
+    private DeleteUserService deleteUserService;
 
-    @PostMapping(path="/add")
+    @PostMapping(path="/addUser")
     public @ResponseBody String addNewUser (@RequestParam String name
             , @RequestParam String email) {
 
-        List<User> existingUser = userRepository.findByName(name);
-        if (!existingUser.isEmpty()) {
-            return "User with name already exists";
-        }
-
-        if (!emailValidationService.isValidEmail(email)) {
-            return "Invalid email format";
-        }
-
-        User n = new User();
-        n.setName(name);
-        n.setEmail(email);
-        userRepository.save(n);
-        return "Saved";
+        return addUserService.InsertUser(name,email);
     }
 
-    @GetMapping(path="/all")
+    @GetMapping(path="/getAllUsers")
     public @ResponseBody Iterable<User> getAllUsers() {
 
         return userRepository.findAll();
     }
-    @GetMapping(path="/getbyname")
+    @GetMapping(path="/getUserByName")
     public ResponseEntity<?> getByName(@RequestParam String name) {
-        try {
-            List<User> existingUser = userRepository.findByName(name);
-            if (existingUser.isEmpty()) {
-                return new ResponseEntity<>("User with name does not exist", HttpStatus.NOT_FOUND);
-            }
-            return new ResponseEntity<>(existingUser, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+       return getByNameService.getByName(name);
 
     }
-    @PutMapping(path="/update")
+    @PutMapping(path="/updateUser")
     public ResponseEntity<?> updateUser(@RequestParam int id, @RequestParam String name, @RequestParam String email) {
-        User existingUser = userRepository.findById(id);
-        if (existingUser == null) {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-        }
-        if (!emailValidationService.isValidEmail(email)) {
-            return new ResponseEntity<>("Invalid email format", HttpStatus.BAD_REQUEST);
-        }
-        existingUser.setName(name);
-        existingUser.setEmail(email);
-        userRepository.save(existingUser);
-        return new ResponseEntity<>("User updated successfully", HttpStatus.OK);
+        return updateUserService.updateUserInfo(id,name,email);
     }
-    @DeleteMapping(path="/delete")
+    @DeleteMapping(path="/deleteUser")
     public ResponseEntity<?> deleteUser(@RequestParam int id) {
-        if (!userRepository.existsById(id)) {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-        }
-        userRepository.deleteById(id);
-        return new ResponseEntity<>("User with id = " + id + " deleted", HttpStatus.OK);
-
+       return deleteUserService.deleteUser(id);
     }
 }
